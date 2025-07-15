@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎙️ Voice Emotion Detection</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f7971e, #ffd200);
+      padding: 2rem;
+      color: #333;
+    }
+    h2 { color: #222; }
+    #recordBtn, #stopBtn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #recordBtn { background-color: #28a745; color: white; }
+    #stopBtn { background-color: #dc3545; color: white; }
+    #status {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      color: #444;
+    }
+    #result {
+      font-size: 1.5rem;
+      margin-top: 10px;
+      color: #00695c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎙️ Voice Emotion Detection</h2>
+  <p>Please read aloud the following sentence:</p>
+  <p><strong>"I am feeling really excited about this new opportunity!"</strong></p>
+
+  <button id="recordBtn">🎤 Start Recording</button>
+  <button id="stopBtn" disabled>⏹️ Stop & Predict</button>
+
+  <p id="status">⏳ Waiting...</p>
+  <p id="result"></p>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const recordBtn = document.getElementById("recordBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const statusText = document.getElementById("status");
+    const resultText = document.getElementById("result");
+
+    recordBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.start();
+      statusText.innerText = "🎙️ Recording...";
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "voice.wav");
+
+        statusText.innerText = "⏳ Processing...";
+        resultText.innerText = "";
+
+        try {
+          const response = await fetch("http://127.0.0.1:5000/predict-voice", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await response.json();
+          const emotion = data.emotion;
+
+          if (emotion && emotion !== "undefined") {
+            statusText.innerText = "✅ Detected successfully!";
+            resultText.innerText = "🧠 Predicted Emotion: " + emotion;
+
+            let voiceData = JSON.parse(localStorage.getItem("emotionCounts_voice")) || {};
+            voiceData[emotion] = (voiceData[emotion] || 0) + 1;
+            localStorage.setItem("emotionCounts_voice", JSON.stringify(voiceData));
+            localStorage.setItem("puzzle7", "solved");
+          } else {
+            statusText.innerText = "❌ Could not detect emotion.";
+            resultText.innerText = "😕 Please try again.";
+          }
+        } catch (err) {
+          console.error("❌ Error:", err);
+          statusText.innerText = "⚠️ Error occurred.";
+          resultText.innerText = "❌ Could not detect emotion.";
+        }
+      };
+    };
+
+    stopBtn.onclick = () => {
+      mediaRecorder.stop();
+      recordBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+  </script>
+
+</body>
+</html>

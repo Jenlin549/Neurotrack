@@ -1,0 +1,92 @@
+/* style.css */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #6A82FB, #FC5C7D);
+  color: #fefefe;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.navbar nav a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: #FFD166;
+  font-weight: bold;
+}
+
+.home {
+  padding: 6rem 1rem;
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+}
+
+h2 {
+  font-size: 2.8rem;
+  margin: 0.5rem 0;
+  font-weight: bold;
+  text-shadow: 2px 2px #33333333;
+}
+
+p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #fefefe;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.buttons .btn {
+  display: inline-block;
+  margin: 0 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #FFD166;
+  color: #000;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn.secondary {
+  background: #06D6A0;
+  color: #000;
+}
+
+footer {
+  margin-top: 4rem;
+  padding: 1rem;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+}
+

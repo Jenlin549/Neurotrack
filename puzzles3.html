@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Match - Puzzle 3</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #6a82fb, #fc5c7d);
+      text-align: center;
+      padding: 2rem;
+      color: #fff;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(2, 100px);
+      gap: 20px;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #ffffff20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 2rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.3s;
+    }
+
+    .card.revealed {
+      background-color: #fff;
+    }
+
+    .hidden-img {
+      display: none;
+    }
+
+    #result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    #nextBtn {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #FFD166;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #nextBtn:hover {
+      background-color: #ffae00;
+    }
+  </style>
+</head>
+<body>
+  <h2>🧠 Puzzle 3 – Memory Match</h2>
+  <p>Match all the pairs to win</p>
+  <div class="board" id="gameBoard"></div>
+  <div id="result"></div>
+  <button id="nextBtn" onclick="goToNext()">💾 Save and Go to Puzzle 4</button>
+
+<script>
+  const images = ['🦁', '🦊']; // Emoji pairs
+  const cards = [...images, ...images].sort(() => 0.5 - Math.random());
+  const board = document.getElementById('gameBoard');
+  const result = document.getElementById('result');
+  const nextBtn = document.getElementById('nextBtn');
+
+  let firstCard = null;
+  let secondCard = null;
+  let matched = 0;
+  let startTime = Date.now(); // ⏱ Start timer
+
+  function createCard(content, index) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.index = index;
+    card.dataset.value = content;
+    card.innerText = '';
+    card.onclick = () => flipCard(card);
+    board.appendChild(card);
+  }
+
+  function flipCard(card) {
+    if (card.classList.contains('revealed') || secondCard) return;
+
+    card.innerText = card.dataset.value;
+    card.classList.add('revealed');
+
+    if (!firstCard) {
+      firstCard = card;
+    } else {
+      secondCard = card;
+      checkMatch();
+    }
+  }
+
+  function checkMatch() {
+    if (firstCard.dataset.value === secondCard.dataset.value) {
+      matched++;
+      firstCard = null;
+      secondCard = null;
+
+      if (matched === images.length) {
+        const timeTaken = (Date.now() - startTime) / 1000; // in seconds
+
+        result.innerText = "✅ SUCCESS!";
+        nextBtn.style.display = "inline-block";
+        localStorage.setItem("puzzle3", "solved");
+
+        updateProgress(1, 1, timeTaken); // 🧠 Save performance
+      }
+    } else {
+      setTimeout(() => {
+        firstCard.innerText = '';
+        secondCard.innerText = '';
+        firstCard.classList.remove('revealed');
+        secondCard.classList.remove('revealed');
+        firstCard = null;
+        secondCard = null;
+      }, 1000);
+    }
+  }
+
+  function updateProgress(correct, total, time) {
+    let oldCorrect = parseInt(localStorage.getItem("correctAnswers")) || 0;
+    let oldTotal = parseInt(localStorage.getItem("totalQuestions")) || 0;
+    let oldTime = parseFloat(localStorage.getItem("totalTimeSeconds")) || 0;
+    let level = parseInt(localStorage.getItem("level")) || 0;
+
+    localStorage.setItem("correctAnswers", oldCorrect + correct);
+    localStorage.setItem("totalQuestions", oldTotal + total);
+    localStorage.setItem("totalTimeSeconds", oldTime + time);
+    localStorage.setItem("level", Math.max(level, 3)); // ✅ level 3 for Puzzle 3
+  }
+
+  function goToNext() {
+    window.location.href = "puzzle4.html"; // ✅ Go to next puzzle
+  }
+
+  // 👇 Init cards
+  cards.forEach((img, i) => createCard(img, i));
+</script>
+
+  </script>
+</body>
+</html>

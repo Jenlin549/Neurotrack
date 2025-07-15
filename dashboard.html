@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧠 NeuroTracker Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(to right, #DAE2F8, #D6A4A4);
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+
+    .metrics {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .metric {
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 1rem;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .chart-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    canvas {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      max-width: 300px;
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 NeuroTracker Performance Dashboard</h1>
+
+  <div class="metrics">
+    <div class="metric">
+      <h3>🎯 Accuracy</h3>
+      <p id="accuracy">--%</p>
+    </div>
+    <div class="metric">
+      <h3>⏱ Avg. Response Time</h3>
+      <p id="responseTime">-- sec</p>
+    </div>
+    <div class="metric">
+      <h3>🚀 Level Progression</h3>
+      <p id="level">-- / 5</p>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="barChart"></canvas>
+    <canvas id="emotionChart"></canvas>
+    <canvas id="faceChart"></canvas>
+    <canvas id="voiceChart"></canvas>
+  </div>
+
+  <script>
+    // 🧠 Accuracy, time, level
+    const correctAnswers = parseInt(localStorage.getItem("correctAnswers")) || 0;
+    const totalQuestions = parseInt(localStorage.getItem("totalQuestions")) || 1;
+    let level = parseInt(localStorage.getItem("level")) || 1;
+    if (level > 5) level = 5;
+    const totalTimeSeconds = parseFloat(localStorage.getItem("totalTimeSeconds")) || 1;
+
+    const accuracy = ((correctAnswers / totalQuestions) * 100).toFixed(1);
+    const avgTime = (totalTimeSeconds / totalQuestions).toFixed(2);
+
+    document.getElementById("accuracy").textContent = `${accuracy}%`;
+    document.getElementById("responseTime").textContent = `${avgTime} sec`;
+    document.getElementById("level").textContent = `${level} / 5`;
+
+    // 🎭 Emotion data
+    const faceData = JSON.parse(localStorage.getItem("emotionCounts_face")) || {};
+    const voiceData = JSON.parse(localStorage.getItem("emotionCounts_voice")) || {};
+    const allEmotions = new Set([...Object.keys(faceData), ...Object.keys(voiceData)]);
+    const combined = {};
+
+    allEmotions.forEach(emotion => {
+      combined[emotion] = (faceData[emotion] || 0) + (voiceData[emotion] || 0);
+    });
+
+    // 📊 Bar Chart for Puzzle Completion
+    const ctxBar = document.getElementById("barChart").getContext("2d");
+    new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: ["Puzzle 1", "Puzzle 2", "Puzzle 3", "Puzzle 4", "Puzzle 5"],
+        datasets: [{
+          label: "Completion",
+          data: [
+            localStorage.getItem("puzzle1") ? 1 : 0,
+            localStorage.getItem("puzzle2") ? 1 : 0,
+            localStorage.getItem("puzzle3") ? 1 : 0,
+            localStorage.getItem("puzzle4") ? 1 : 0,
+            localStorage.getItem("puzzle5") ? 1 : 0
+          ],
+          backgroundColor: "#3498db"
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 1,
+            ticks: { stepSize: 1 }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // 🍰 Combined Emotion Pie Chart
+    const ctxCombined = document.getElementById("emotionChart").getContext("2d");
+    new Chart(ctxCombined, {
+      type: "pie",
+      data: {
+        labels: Object.keys(combined),
+        datasets: [{
+          label: "Combined Emotion Distribution",
+          data: Object.values(combined),
+          backgroundColor: ["#f1c40f", "#3498db", "#e74c3c", "#95a5a6", "#8e44ad", "#1abc9c", "#d35400", "#7f8c8d"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+
+    // 🙂 Facial Emotion Chart
+    const ctxFace = document.getElementById("faceChart").getContext("2d");
+    new Chart(ctxFace, {
+      type: "pie",
+      data: {
+        labels: Object.keys(faceData),
+        datasets: [{
+          label: "Facial Emotion Distribution",
+          data: Object.values(faceData),
+          backgroundColor: ["#ffcc29", "#d91e18", "#27ae60", "#8e44ad", "#16a085"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+
+    // 🔊 Voice Emotion Chart
+    const ctxVoice = document.getElementById("voiceChart").getContext("2d");
+    new Chart(ctxVoice, {
+      type: "pie",
+      data: {
+        labels: Object.keys(voiceData),
+        datasets: [{
+          label: "Voice Emotion Distribution",
+          data: Object.values(voiceData),
+          backgroundColor: ["#3498db", "#f39c12", "#e74c3c", "#7f8c8d", "#9b59b6"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+  </script>
+</body>
+</html>

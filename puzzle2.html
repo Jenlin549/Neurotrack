@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Puzzle 2 – Sequence Builder</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h2 {
+      margin-top: 1rem;
+    }
+
+    .sequence {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      font-size: 2rem;
+      margin-top: 2rem;
+    }
+
+    .options {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .option {
+      background-color: white;
+      color: black;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+    }
+
+    #nextBtn {
+      margin-top: 1.5rem;
+      display: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #FFD166;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #nextBtn:hover {
+      background-color: #ffae00;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧩 Puzzle 2 – Sequence Builder</h2>
+  <p>Complete the pattern: 3, 6, 9, ?, ?</p>
+
+  <div class="sequence">
+    <span>3</span>
+    <span>6</span>
+    <span>9</span>
+    <span id="missing1">?</span>
+    <span id="missing2">?</span>
+  </div>
+
+  <div class="options">
+    <div class="option" onclick="checkAnswer(12, 15)">12 & 15</div>
+    <div class="option" onclick="checkAnswer(11, 18)">11 & 18</div>
+    <div class="option" onclick="checkAnswer(10, 13)">10 & 13</div>
+  </div>
+
+  <div id="result"></div>
+  <button id="nextBtn" onclick="goToNext()">💾 Save and Go to Puzzle 3</button>
+
+<script>
+  const result = document.getElementById("result");
+  const nextBtn = document.getElementById("nextBtn");
+  const missing1 = document.getElementById("missing1");
+  const missing2 = document.getElementById("missing2");
+
+  let startTime = Date.now(); // Start timer
+
+  function checkAnswer(num1, num2) {
+    missing1.innerText = num1;
+    missing2.innerText = num2;
+
+    if (num1 === 12 && num2 === 15) {
+      result.innerText = "✅ SUCCESS!";
+      result.style.color = "#00ff99";
+      nextBtn.style.display = "inline-block";
+      localStorage.setItem("puzzle2", "solved");
+
+      const timeTaken = (Date.now() - startTime) / 1000; // seconds
+      updateProgress(1, 1, timeTaken); // 1 correct, 1 question
+    } else {
+      result.innerText = "❌ TRY AGAIN!";
+      result.style.color = "#ff4d4d";
+      nextBtn.style.display = "none";
+    }
+  }
+
+  function updateProgress(correct, total, time) {
+    let oldCorrect = parseInt(localStorage.getItem("correctAnswers")) || 0;
+    let oldTotal = parseInt(localStorage.getItem("totalQuestions")) || 0;
+    let oldTime = parseFloat(localStorage.getItem("totalTimeSeconds")) || 0;
+    let level = parseInt(localStorage.getItem("level")) || 0;
+
+    localStorage.setItem("correctAnswers", oldCorrect + correct);
+    localStorage.setItem("totalQuestions", oldTotal + total);
+    localStorage.setItem("totalTimeSeconds", oldTime + time);
+    localStorage.setItem("level", Math.max(level, 2)); // Set level to 2 after puzzle 2
+  }
+
+  function goToNext() {
+    window.location.href = "puzzles3.html"; // Fixed typo from 'puzzles3.html'
+  }
+</script>
+
+
+</body>
+</html>

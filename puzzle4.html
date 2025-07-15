@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Puzzle 4 – Reaction Timer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h2 {
+      margin-top: 1rem;
+      font-size: 2rem;
+    }
+
+    #box {
+      margin: 3rem auto;
+      width: 250px;
+      height: 150px;
+      background-color: red;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    #nextBtn {
+      display: none;
+      margin-top: 2rem;
+      padding: 10px 20px;
+      background-color: #FFD166;
+      color: black;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #nextBtn:hover {
+      background-color: #ffae00;
+    }
+  </style>
+</head>
+<body>
+  <h2>🟢 Puzzle 4 – Reaction Timer</h2>
+  <p>Click the box <strong>only when it turns green</strong></p>
+
+  <div id="box">Wait for GREEN...</div>
+  <div id="result"></div>
+  <button id="nextBtn" onclick="goToNext()">💾 Save and Go to Facial Emotion</button>
+
+  <script>
+    const box = document.getElementById("box");
+    const result = document.getElementById("result");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let startTime, timeout;
+    let greenShown = false;
+
+    function startGame() {
+      box.style.backgroundColor = "red";
+      box.innerText = "Wait for GREEN...";
+      result.innerText = "";
+      greenShown = false;
+      nextBtn.style.display = "none";
+
+      let randomDelay = Math.floor(Math.random() * 3000) + 2000; // 2–5 sec
+      timeout = setTimeout(() => {
+        box.style.backgroundColor = "green";
+        box.innerText = "CLICK NOW!";
+        startTime = new Date().getTime();
+        greenShown = true;
+      }, randomDelay);
+    }
+
+    box.onclick = () => {
+      if (!greenShown) {
+        clearTimeout(timeout);
+        result.innerText = "⛔ Too Soon! Try Again.";
+        result.style.color = "#ff4d4d";
+        startGame();
+      } else {
+        let reactionTime = new Date().getTime() - startTime;
+        result.innerText = `✅ Success! Your time: ${reactionTime} ms`;
+        result.style.color = "#00ff99";
+        localStorage.setItem("puzzle5", "solved");
+
+        // ✅ Update performance tracking
+        updateProgress(1, 1, reactionTime / 1000);
+        nextBtn.style.display = "inline-block";
+      }
+    };
+
+    function updateProgress(correct, total, time) {
+      let oldCorrect = parseInt(localStorage.getItem("correctAnswers")) || 0;
+      let oldTotal = parseInt(localStorage.getItem("totalQuestions")) || 0;
+      let oldTime = parseFloat(localStorage.getItem("totalTimeSeconds")) || 0;
+      let level = parseInt(localStorage.getItem("level")) || 0;
+
+      localStorage.setItem("correctAnswers", oldCorrect + correct);
+      localStorage.setItem("totalQuestions", oldTotal + total);
+      localStorage.setItem("totalTimeSeconds", oldTime + time);
+      localStorage.setItem("level", Math.max(level, 5)); // Set to level 5 for Puzzle 5
+    }
+    function goToNext() {
+      window.location.href = "puzzle5.html"; // Or puzzle6.html if you have more
+    }
+
+    
+    // Start when page loads
+    window.onload = startGame;
+  </script>
+</body>
+</html>

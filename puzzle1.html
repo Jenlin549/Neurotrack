@@ -1,0 +1,113 @@
+<!-- puzzle1.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Puzzle 1 - Tap the Target</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+    h2 {
+      color: #58d68d;
+    }
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    .emoji {
+      font-size: 2rem;
+      cursor: pointer;
+      background: #2c3e50;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    #result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    #nextBtn {
+      margin-top: 1.5rem;
+      display: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #FFD166;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #nextBtn:hover {
+      background-color: #ffae00;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎯 Puzzle 1 – Tap the Target</h2>
+  <p>Find and click the 😐 face</p>
+  <div class="emoji-grid" id="emojiGrid"></div>
+  <div id="result"></div>
+  <button id="nextBtn" onclick="goToNext()">💾 Save and Go to Puzzle 2</button>
+
+  <script>
+    const grid = document.getElementById("emojiGrid");
+    const result = document.getElementById("result");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const sad = "😔";
+    const target = "😐";
+
+    function loadGrid() {
+      let targetIndex = Math.floor(Math.random() * 25);
+      for (let i = 0; i < 25; i++) {
+        const emoji = document.createElement("div");
+        emoji.classList.add("emoji");
+        emoji.innerText = i === targetIndex ? target : sad;
+
+        emoji.onclick = () => {
+          if (i === targetIndex) {
+            result.innerText = "✅ SUCCESS!";
+            result.style.backgroundColor = "#58d68d";
+            nextBtn.style.display = "inline-block";
+            localStorage.setItem("puzzle1", "solved");
+          } else {
+            result.innerText = "❌ TRY AGAIN!";
+            result.style.backgroundColor = "#e74c3c";
+          }
+        };
+        grid.appendChild(emoji);
+      }
+    }
+    function updateProgress(correct, total, time) {
+    let oldCorrect = parseInt(localStorage.getItem("correctAnswers")) || 0;
+    let oldTotal = parseInt(localStorage.getItem("totalQuestions")) || 0;
+    let oldTime = parseFloat(localStorage.getItem("totalTimeSeconds")) || 0;
+    let level = parseInt(localStorage.getItem("level")) || 0;
+
+    localStorage.setItem("correctAnswers", oldCorrect + correct);
+    localStorage.setItem("totalQuestions", oldTotal + total);
+    localStorage.setItem("totalTimeSeconds", oldTime + time);
+    localStorage.setItem("level", Math.max(level, 1)); // set to 1 if higher
+  }
+
+
+    function goToNext() {
+      window.location.href = "puzzle2.html";
+    }
+
+    loadGrid();
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Puzzle 5 – Emotion Sorting</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00b09b, #96c93d);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    .emoji-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .emoji {
+      font-size: 2.5rem;
+      background-color: #ffffff20;
+      padding: 20px;
+      border-radius: 12px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .drop-zone {
+      border: 2px dashed white;
+      padding: 30px;
+      border-radius: 15px;
+      min-width: 150px;
+      min-height: 120px;
+      margin: 20px;
+    }
+
+    .drop-label {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+
+    .zones {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    #result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    #nextBtn {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 10px 20px;
+      background-color: #FFD166;
+      color: black;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #nextBtn:hover {
+      background-color: #ffae00;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>😊 Puzzle 5 – Emotion Sorting</h2>
+  <p>Drag each face into the correct emotion box</p>
+
+  <div class="emoji-container" id="emojiContainer">
+    <div class="emoji" draggable="true" data-emotion="happy">😊</div>
+    <div class="emoji" draggable="true" data-emotion="sad">😢</div>
+    <div class="emoji" draggable="true" data-emotion="angry">😡</div>
+    <div class="emoji" draggable="true" data-emotion="happy">😁</div>
+    <div class="emoji" draggable="true" data-emotion="sad">😭</div>
+    <div class="emoji" draggable="true" data-emotion="angry">😠</div>
+  </div>
+
+  <div class="zones">
+    <div class="drop-zone" id="happyZone" ondrop="drop(event)" ondragover="allowDrop(event)" data-zone="happy">
+      <div class="drop-label">😊 Happy</div>
+    </div>
+    <div class="drop-zone" id="sadZone" ondrop="drop(event)" ondragover="allowDrop(event)" data-zone="sad">
+      <div class="drop-label">😢 Sad</div>
+    </div>
+    <div class="drop-zone" id="angryZone" ondrop="drop(event)" ondragover="allowDrop(event)" data-zone="angry">
+      <div class="drop-label">😡 Angry</div>
+    </div>
+  </div>
+
+  <div id="result"></div>
+  <button id="nextBtn" onclick="goToNext()">💾 Save and Go to Puzzle 6</button>
+
+  <script>
+    let correct = 0;
+    const startTime = Date.now();
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      const draggedEmoji = document.getElementById(data);
+      const targetZone = ev.currentTarget.getAttribute("data-zone");
+      const emojiEmotion = draggedEmoji.getAttribute("data-emotion");
+
+      if (targetZone === emojiEmotion) {
+        ev.currentTarget.appendChild(draggedEmoji);
+        correct++;
+        draggedEmoji.setAttribute("draggable", false);
+      } else {
+        alert("❌ Wrong box! Try again.");
+      }
+
+      if (correct === 6) {
+        document.getElementById("result").innerText = "✅ Well done! All sorted.";
+        document.getElementById("nextBtn").style.display = "inline-block";
+
+        const timeTaken = (Date.now() - startTime) / 1000; // in seconds
+        updateProgress(1, 1, timeTaken);
+
+        localStorage.setItem("puzzle5", "solved");
+      }
+    }
+
+    // Assign draggable IDs
+    document.querySelectorAll('.emoji').forEach((emoji, index) => {
+      emoji.id = "emoji" + index;
+      emoji.ondragstart = (e) => {
+        e.dataTransfer.setData("text", emoji.id);
+      };
+    });
+
+    function updateProgress(correct, total, time) {
+      let oldCorrect = parseInt(localStorage.getItem("correctAnswers")) || 0;
+      let oldTotal = parseInt(localStorage.getItem("totalQuestions")) || 0;
+      let oldTime = parseFloat(localStorage.getItem("totalTimeSeconds")) || 0;
+      let level = parseInt(localStorage.getItem("level")) || 0;
+
+      localStorage.setItem("correctAnswers", oldCorrect + correct);
+      localStorage.setItem("totalQuestions", oldTotal + total);
+      localStorage.setItem("totalTimeSeconds", oldTime + time);
+      localStorage.setItem("level", Math.max(level, 5)); // 🧠 Puzzle 5 complete
+    }
+
+    function goToNext() {
+      window.location.href = "facial_emotion_project/puzzle8_face.html";
+    }
+  </script>
+
+</body>
+</html>
