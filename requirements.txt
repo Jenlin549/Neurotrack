@@ -1,7 +1,0 @@
-Flask
-flask-cors
-tensorflow
-numpy
-librosa
-pydub
-pandas
